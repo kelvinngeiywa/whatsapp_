@@ -1,0 +1,6 @@
+@whatsapp_cloud_api_HostAddress = http://localhost:5003
+
+GET {{whatsapp_cloud_api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,3 @@
+D:\projects\dotnet\whatsapp_cloud_api\text
+
+ngrok http --domain=winning-corgi-greatly.ngrok-free.app https://localhost:7041

@@ -1,0 +1,48 @@
+[
+  {
+    "ContainingType": "whatsapp_cloud_api.Controllers.MessagingController",
+    "Method": "Post",
+    "RelativePath": "api/Messaging",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "whatsapp_cloud_api.Controllers.MessagingController",
+    "Method": "Get",
+    "RelativePath": "api/Messaging",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "hub.mode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "hub.verify_token",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "hub.challenge",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "whatsapp_cloud_api.Controllers.MessagingController",
+    "Method": "Greetings",
+    "RelativePath": "api/Messaging/greetings",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]
