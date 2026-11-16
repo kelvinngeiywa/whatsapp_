@@ -28,6 +28,10 @@ namespace whatsapp_cloud_api.Services
                         await ProcessInteractiveMessage(fromNumber, message,contact);
                         break;
 
+                    case "location":
+                        await SendAutomatedMessage(fromNumber, "Thank you for sharing your location");
+                        break;
+
                     default:
                         await ProcessUnknownMessageType(messageType, fromNumber);
                         break;
@@ -49,9 +53,10 @@ namespace whatsapp_cloud_api.Services
             var profileName = contacts.GetProperty("profile").GetProperty("name").GetString();
             logger.LogWarning($"profile is {profileName}");
 
-            if (messageText.Contains("hello") || messageText.Contains("hi"))
+            if (messageText.Contains("hello") || messageText.Contains("hi") || messageText.Contains("good morning")
+                || messageText.Contains("good afternoon") || messageText.Contains("good evening"))
             {
-                await SendAutomatedMessage(fromNumber, $"Hello {profileName}");
+                await SendAutomatedMessage(fromNumber, $"Hello {profileName}, Welcome to Mavuno Church");
                 await SendReplyButtonsAsync(fromNumber);
             }
             else
@@ -77,6 +82,9 @@ namespace whatsapp_cloud_api.Services
                     await processReplyButtonMessage(message, profileName, fromNumber);
 
                     break;
+                case "location":
+                    await SendAutomatedMessage(fromNumber, "Thank you for sharing location");
+                    break;
                 default:
                     await ProcessUnknownMessageType(interactiveType, fromNumber);
                     break;
@@ -98,27 +106,51 @@ namespace whatsapp_cloud_api.Services
 
         }
 
+        private async Task SendRequestLocationMessage(string phoneNumber)
+        {
+            var payload = new
+            {
+                messaging_product = "whatsapp",
+                recipient_type = "individual",
+                to = phoneNumber,
+                type = "interactive",
+                interactive= new
+                {
+                    type="location_request_message",
+                    body = new
+                    {
+                        text="Share location"
+                    },
+                    action = new
+                    {
+                        name="send_location"
+                    }
+                }
+            };
+            await whatsAppMessage.SendMessage(payload);
+        }
+
         private async Task SendReplyButtonsAsync(string toPhoneNumber)
         {
             var payload = new
             {
                 messaging_product = "whatsapp",
                 recipient_type = "individual",
-                to = toPhoneNumber, // e.g. "254712345678" (no + or spaces)
+                to = toPhoneNumber,
                 type = "interactive",
                 interactive = new
                 {
                     type = "button",
-                    header = new { type = "text", text = "Dear valued customer." },
-                    body = new { text = "Would you like to receive marketing messages from us in the future?" },
+                    header = new { type = "text", text = "Thank you for attending The November Gathering." },
+                    body = new { text = "Would you be willing to take part in the survey?" },
                     footer = new { text = "Please select an option" },
                     action = new
                     {
                         buttons = new[]
                         {
                         new { type = "reply", reply = new { id = "yes", title = "Yes" } },
-                        new { type = "reply", reply = new { id = "no", title = "No" } },
-                        new { type = "reply", reply = new { id = "never", title = "Never" } }
+                        new { type = "reply", reply = new { id = "no", title = "No" } }
+                        
                     }
                     }
                 }
@@ -127,6 +159,122 @@ namespace whatsapp_cloud_api.Services
             await whatsAppMessage.SendMessage(payload);
 
 
+        }
+
+        private async Task SendGatheringButtonsAsync(string toPhoneNumber)
+        {
+            var payload = new
+            {
+                messaging_product = "whatsapp",
+                recipient_type = "individual",
+                to = toPhoneNumber,
+                type = "interactive",
+                interactive = new
+                {
+                    type = "button",
+                    header = new { type = "text", text = "Thank you for attending The November Gathering." },
+                    body = new { text = "Which days did you attend the gathering?" },
+                    footer = new { text = "Please select an option" },
+                    action = new
+                    {
+                        buttons = new[]
+                        {
+                        new { type = "reply", reply = new { id = "friday", title = "Friday" } },
+                        new { type = "reply", reply = new { id = "saturday", title = "Saturday" } },
+                        new {type="reply",reply= new {id="both",title="Both days"}}
+
+                    }
+                    }
+                }
+            };
+
+            await whatsAppMessage.SendMessage(payload);
+
+
+        }
+
+        private async Task SendProductList(string mobileNumber)
+        {
+            var messagePayload = new
+            {
+                messaging_product = "whatsapp",
+                recipient_type = "individual",
+                to = mobileNumber,
+                type = "interactive",
+                interactive=new
+                {
+                    type = "list",
+                    header = new { type = "text", text = "Select the food item you would like." },
+                    body = new { text = "Choose from the list that has been sent to you" },
+                    footer = new { text = "Thank you for shopping with us." },
+                    action = new
+                    {
+                        button="Products",
+                        sections = new[]
+                        {
+                            new
+                            {
+                                title="Computers",
+                                rows = new[]
+                                {
+                                    new {id="1",title="Lenovo",description="Best lenovo laptop\nKsh.30000"},
+                                    new { id = "comp_1", title = "Lenovo", description = "Best Lenovo laptop - Ksh 30,000" },
+                                     new { id = "comp_2", title = "HP",     description = "Office laptop - Ksh 28,000" },
+                                    
+                                    
+                                }
+                            },
+                            new
+                            {
+                                title="HP",
+                                rows = new[]
+                                {
+                                    new {id="1",title="Lenovo",description="Best lenovo laptop\nKsh.30000"},
+                                    new {id="2",title="Lenovo",description="Best lenovo laptop\nKsh.30000"},
+                                    
+                                }
+                            },
+                            new
+                            {
+                                title="Lenovo",
+                                rows = new[]
+                                {
+                                    new {id="1",title="Lenovo",description="Best lenovo laptop\nKsh.30000"}
+                                }
+                            },
+                            new
+                            {
+                                title="Tecno",
+                                rows = new[]
+                                {
+                                    new {id="1",title="Lenovo",description="Best lenovo laptop\nKsh.30000"}
+                                }
+                            },
+                            new
+                            {
+                                title="Samsung",
+                                rows = new[]
+                                {
+                                    new {id="1",title="Lenovo",description="Best lenovo laptop\nKsh.30000"}
+                                }
+                            },
+                            new
+                            {
+                                title="Huawei",
+                                rows = new[]
+                                {
+                                    new {id="1",title="Lenovo",description="Best lenovo laptop\nKsh.30000"}
+                                }
+                            }
+
+                        }
+                       
+
+                    }
+
+                }
+            };
+            await whatsAppMessage.SendMessage(messagePayload);
         }
 
         private async Task SendListMessage(string phoneNumber)
@@ -210,16 +358,24 @@ namespace whatsapp_cloud_api.Services
                 switch (buttonIdText)
                 {
                     case "yes":
-                        await SendAutomatedMessage(phoneNumber, "You've selected 'YES;");
-                        await SendListMessage(phoneNumber);
+                        await SendGatheringButtonsAsync(phoneNumber);
+                       
                         break;
+                    case "friday":
+                        await SendAutomatedMessage(phoneNumber, "Ooh you attended on Friday!!");
+                        break;
+
+                    case "saturday":
+                        await SendAutomatedMessage(phoneNumber, "Ooh, you attended on Saturday");
+                        break;
+
+                    case "both":
+                        await SendAutomatedMessage(phoneNumber, "Ooh, you attended both days!!");
+                        break;
+
 
                     case "no":
-                        await SendAutomatedMessage(phoneNumber,"You've selected 'NO'");
-                        break;
-
-                    case "never":
-                        await SendAutomatedMessage(phoneNumber, "You've selected 'NEVER");
+                        await SendAutomatedMessage(phoneNumber,"Thank you have a good day.");
                         break;
 
                     default:

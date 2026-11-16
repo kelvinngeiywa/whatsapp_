@@ -33,3 +33,4 @@ D:\projects\dotnet\whatsapp_cloud_api\obj\Debug\net10.0\whatsapp_cloud_api.pdb
 D:\projects\dotnet\whatsapp_cloud_api\obj\Debug\net10.0\whatsapp_cloud_api.genruntimeconfig.cache
 D:\projects\dotnet\whatsapp_cloud_api\obj\Debug\net10.0\ref\whatsapp_cloud_api.dll
 D:\projects\dotnet\whatsapp_cloud_api\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
+D:\projects\dotnet\whatsapp_cloud_api\obj\Debug\net10.0\whatsapp_cloud_api.sourcelink.json
