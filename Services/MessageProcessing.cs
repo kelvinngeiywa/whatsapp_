@@ -56,7 +56,7 @@ namespace whatsapp_cloud_api.Services
             if (messageText.Contains("hello") || messageText.Contains("hi") || messageText.Contains("good morning")
                 || messageText.Contains("good afternoon") || messageText.Contains("good evening"))
             {
-                await SendAutomatedMessage(fromNumber, $"Hello {profileName}, Welcome to Mavuno Church");
+                await SendAutomatedMessage(fromNumber, $"Hello {profileName}, Welcome to Prime Hub shop");
                 await SendReplyButtonsAsync(fromNumber);
             }
             else
@@ -76,7 +76,7 @@ namespace whatsapp_cloud_api.Services
             {
                 case "list_reply":
                     await SendAutomatedMessage(fromNumber, "Thank you for selecting!!");
-                    await processListreplyMessage(message);
+                    await processListreplyMessage(message,fromNumber);
                     break;
                 case "button_reply":
                     await processReplyButtonMessage(message, profileName, fromNumber);
@@ -141,8 +141,8 @@ namespace whatsapp_cloud_api.Services
                 interactive = new
                 {
                     type = "button",
-                    header = new { type = "text", text = "Thank you for attending The November Gathering." },
-                    body = new { text = "Would you be willing to take part in the survey?" },
+                    header = new { type = "text", text = "Welcome to Prime Hub shop?" },
+                    body = new { text = "Do you want to view our products?" },
                     footer = new { text = "Please select an option" },
                     action = new
                     {
@@ -151,38 +151,6 @@ namespace whatsapp_cloud_api.Services
                         new { type = "reply", reply = new { id = "yes", title = "Yes" } },
                         new { type = "reply", reply = new { id = "no", title = "No" } }
                         
-                    }
-                    }
-                }
-            };
-
-            await whatsAppMessage.SendMessage(payload);
-
-
-        }
-
-        private async Task SendGatheringButtonsAsync(string toPhoneNumber)
-        {
-            var payload = new
-            {
-                messaging_product = "whatsapp",
-                recipient_type = "individual",
-                to = toPhoneNumber,
-                type = "interactive",
-                interactive = new
-                {
-                    type = "button",
-                    header = new { type = "text", text = "Thank you for attending The November Gathering." },
-                    body = new { text = "Which days did you attend the gathering?" },
-                    footer = new { text = "Please select an option" },
-                    action = new
-                    {
-                        buttons = new[]
-                        {
-                        new { type = "reply", reply = new { id = "friday", title = "Friday" } },
-                        new { type = "reply", reply = new { id = "saturday", title = "Saturday" } },
-                        new {type="reply",reply= new {id="both",title="Both days"}}
-
                     }
                     }
                 }
@@ -217,9 +185,9 @@ namespace whatsapp_cloud_api.Services
                                 title="Computers",
                                 rows = new[]
                                 {
-                                    new {id="1",title="Lenovo",description="Best lenovo laptop\nKsh.30000"},
-                                    new { id = "comp_1", title = "Lenovo", description = "Best Lenovo laptop - Ksh 30,000" },
-                                     new { id = "comp_2", title = "HP",     description = "Office laptop - Ksh 28,000" },
+                                    new {id="lenovo1",title="Lenovo Thinkpad",description="Lenovo Thinkpad - Ksh.30000"},
+                                    new { id = "lenovo2", title = "Lenovo", description = "Best Lenovo laptop - Ksh 25,000" },
+                                    new { id = "lenovo3", title = "Lenovo Yoga", description = "Lenovo Yoga - Ksh 38,000" },
                                     
                                     
                                 }
@@ -229,8 +197,8 @@ namespace whatsapp_cloud_api.Services
                                 title="HP",
                                 rows = new[]
                                 {
-                                    new {id="1",title="Lenovo",description="Best lenovo laptop\nKsh.30000"},
-                                    new {id="2",title="Lenovo",description="Best lenovo laptop\nKsh.30000"},
+                                    new {id="hp1",title="Hp Probook",description="Best lenovo laptop - Ksh.35000"},
+                                    new {id="hp2",title="HP EliteBook",description="Best lenovo laptop - Ksh.36000"},
                                     
                                 }
                             },
@@ -239,7 +207,7 @@ namespace whatsapp_cloud_api.Services
                                 title="Lenovo",
                                 rows = new[]
                                 {
-                                    new {id="1",title="Lenovo",description="Best lenovo laptop\nKsh.30000"}
+                                    new {id="lenovo4",title="Lenovo",description="Best lenovo laptop - Ksh.32000"}
                                 }
                             },
                             new
@@ -247,7 +215,7 @@ namespace whatsapp_cloud_api.Services
                                 title="Tecno",
                                 rows = new[]
                                 {
-                                    new {id="1",title="Lenovo",description="Best lenovo laptop\nKsh.30000"}
+                                    new {id="techno1",title="Techno Spark 50",description="Techno Spark 50 - Ksh.20000"}
                                 }
                             },
                             new
@@ -255,15 +223,23 @@ namespace whatsapp_cloud_api.Services
                                 title="Samsung",
                                 rows = new[]
                                 {
-                                    new {id="1",title="Lenovo",description="Best lenovo laptop\nKsh.30000"}
+                                    new {id="samsung1",title="Samsung A16",description="Samsung A16 - Ksh.26000"}
                                 }
                             },
                             new
                             {
-                                title="Huawei",
+                                title="Google Pixel",
                                 rows = new[]
                                 {
-                                    new {id="1",title="Lenovo",description="Best lenovo laptop\nKsh.30000"}
+                                    new {id="google_pixel",title="Google Pixel 7 pro",description="Google Pixel 7 pro - Ksh.36000"}
+                                }
+                            },
+                            new
+                            {
+                                title="Vivo",
+                                rows = new[]
+                                {
+                                    new {id="vivo1",title="Vivo",description="Vivo - Ksh 18,000"}
                                 }
                             }
 
@@ -277,69 +253,70 @@ namespace whatsapp_cloud_api.Services
             await whatsAppMessage.SendMessage(messagePayload);
         }
 
-        private async Task SendListMessage(string phoneNumber)
-        {
-            var payload = new
-            {
-                messaging_product="whatsapp",
-                recipient_type="individual",
-                to=phoneNumber,
-                type="interactive",
-                interactive = new
-                {
-                    type="list",
-                    header=new {type="text",text= "Select the food item you would like." },
-                    body=new {text ="Choose from the list that has been sent to you"},
-                    footer=new {text="Thank you for shopping with us."},
-                    action = new
-                    {
-                        button="Order",
-                        sections = new[]
-                        {
-                            new
-                            {
-                                title="Fruits",
-                                rows = new[]
-                                {
-                                    new { id="1",title="Orange",description="qwertyy"}
-                                }
-                            },
-                            new
-                            {
-                                title="vegetables",
-                                rows = new[]
-                                {
-                                    new {id="1",title="Spinach",description="qwertyy"},
-                                    new {id="2",title="Orange",description="qwertyy"},
-                                    new {id="3",title="Orange",description="qwertyy"}
-                                }
-                            },
-                            new
-                            {
-                                title="toiletry",
-                                rows = new[]
-                                {
-                                    new { id="1",title="Orange",description="qwertyy"}
-                                }
-                            }
-                        }
 
-                    }
-                }
-
-
-            };
-            await whatsAppMessage.SendMessage(payload);
-        }
-
-        private async Task processListreplyMessage(JsonElement message)
+        private async Task processListreplyMessage(JsonElement message, string phoneNumber)
         {
             //var listMessage = message.TryGetProperty("interactive", out JsonElement jsonElement) &&
             //    jsonElement.TryGetProperty("list_reply", out JsonElement listElement);
 
-            var listElement = message.GetProperty("interactive").GetProperty("list_reply").ToString();
+            var listElement = message.GetProperty("interactive").GetProperty("list_reply");
+            var listElementId = message.GetProperty("interactive").GetProperty("list_reply").GetProperty("id").ToString();
+            var productName = listElement.GetProperty("title").ToString();
+            //var productPrice=listElement.GetProperty("")
+            logger.LogWarning($"Select item id is {listElementId}");
+            message.GetProperty("interactive").GetProperty("list_reply");
 
-            logger.LogWarning(listElement.ToString());
+            switch (listElementId)
+            {
+                case "lenovo1":
+                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 30,000");
+
+                    break;
+
+                case "lenovo2":
+                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 25,000");
+                    break;
+
+                case "lenovo3":
+                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 38,000");
+                    break;
+
+                case "lenovo4":
+                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 32,000");
+                    break;
+
+                case "hp1":
+                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 35,000");
+                    break;
+
+                case "hp2":
+                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 35,000");
+                    break;
+
+                case "techno1":
+                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 20,000");
+                    break;
+
+                case "samsung1":
+                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 26,000");
+                    break;
+
+                case "google_pixel":
+                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 36,000");
+                    break;
+
+                case "vivo1":
+                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 18,000");
+                    break;
+
+                default:
+                    await SendAutomatedMessage(phoneNumber,"Unknown list id");
+                    break;
+
+            }
+
+
+            
             
            
          //logger.LogWarning(message);
@@ -358,22 +335,10 @@ namespace whatsapp_cloud_api.Services
                 switch (buttonIdText)
                 {
                     case "yes":
-                        await SendGatheringButtonsAsync(phoneNumber);
+                        await SendProductList(phoneNumber);
                        
                         break;
-                    case "friday":
-                        await SendAutomatedMessage(phoneNumber, "Ooh you attended on Friday!!");
-                        break;
-
-                    case "saturday":
-                        await SendAutomatedMessage(phoneNumber, "Ooh, you attended on Saturday");
-                        break;
-
-                    case "both":
-                        await SendAutomatedMessage(phoneNumber, "Ooh, you attended both days!!");
-                        break;
-
-
+         
                     case "no":
                         await SendAutomatedMessage(phoneNumber,"Thank you have a good day.");
                         break;

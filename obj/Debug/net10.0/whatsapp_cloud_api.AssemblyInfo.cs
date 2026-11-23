@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("whatsapp_cloud_api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ca7b1a343713b307dff070901ec866d242b5814b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a058947da1843a98ed5272610063696abd83a9d5")]
 [assembly: System.Reflection.AssemblyProductAttribute("whatsapp_cloud_api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("whatsapp_cloud_api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
