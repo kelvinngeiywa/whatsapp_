@@ -14,6 +14,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IHubSignature, XHubSignature>();
 builder.Services.AddScoped<IWhatsAppMessage,WhatsAppMessageService>();
 builder.Services.AddScoped<IMessageProcessing,MessageProcessing>();
+builder.Services.AddScoped<IMpesa, MpesaServices>();
 
 builder.Services.AddCors(options =>
 {
