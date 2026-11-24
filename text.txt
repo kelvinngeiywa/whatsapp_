@@ -1,3 +1,9 @@
 D:\projects\dotnet\whatsapp_cloud_api\text
 
 ngrok http --domain=winning-corgi-greatly.ngrok-free.app https://localhost:7041
+
+
+curl https://winning-corgi-greatly.ngrok-free.app/api/MpesaCallback/callback \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data 'null'

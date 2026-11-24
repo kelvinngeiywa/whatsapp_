@@ -5,8 +5,9 @@ using static System.Net.WebRequestMethods;
 
 namespace whatsapp_cloud_api.Services
 {
-    public class MessageProcessing(ILogger<MessageProcessing> logger,IWhatsAppMessage whatsAppMessage) : IMessageProcessing
+    public class MessageProcessing(ILogger<MessageProcessing> logger,IWhatsAppMessage whatsAppMessage, IMpesa mpesaServices) : IMessageProcessing
     {
+        private readonly string callBackUrl = "https://winning-corgi-greatly.ngrok-free.app/api/MpesaCallback/callback";
         public async  Task ProcessMesssage(JsonElement message, JsonElement contact)
         {
             try
@@ -77,6 +78,7 @@ namespace whatsapp_cloud_api.Services
                 case "list_reply":
                     await SendAutomatedMessage(fromNumber, "Thank you for selecting!!");
                     await processListreplyMessage(message,fromNumber);
+                    await SendMpesaNumberButtonsAsync(fromNumber);
                     break;
                 case "button_reply":
                     await processReplyButtonMessage(message, profileName, fromNumber);
@@ -151,6 +153,37 @@ namespace whatsapp_cloud_api.Services
                         new { type = "reply", reply = new { id = "yes", title = "Yes" } },
                         new { type = "reply", reply = new { id = "no", title = "No" } }
                         
+                    }
+                    }
+                }
+            };
+
+            await whatsAppMessage.SendMessage(payload);
+
+
+        }
+
+        private async Task SendMpesaNumberButtonsAsync(string toPhoneNumber)
+        {
+            var payload = new
+            {
+                messaging_product = "whatsapp",
+                recipient_type = "individual",
+                to = toPhoneNumber,
+                type = "interactive",
+                interactive = new
+                {
+                    type = "button",
+                    header = new { type = "text", text = "Prime Hub shop?" },
+                    body = new { text = "Send STK to this number?" },
+                    footer = new { text = "Please select an option" },
+                    action = new
+                    {
+                        buttons = new[]
+                        {
+                        new { type = "reply", reply = new { id = "this_number", title = "Yes" } },
+                        new { type = "reply", reply = new { id = "not_this", title = "No" } }
+
                     }
                     }
                 }
@@ -341,6 +374,18 @@ namespace whatsapp_cloud_api.Services
          
                     case "no":
                         await SendAutomatedMessage(phoneNumber,"Thank you have a good day.");
+                        break;
+
+                    case "this_number":
+                        await SendAutomatedMessage(phoneNumber, "STK has been sent to this number. Please enter your pin");
+                        logger.LogWarning($"Number is {phoneNumber}");
+                        var stkResults=await mpesaServices.InitiateSTKPushAsync(phoneNumber, 1,callBackUrl);
+                        logger.LogWarning($"STK results is: {stkResults}");
+                        await SendAutomatedMessage(phoneNumber, $"STK results is: {stkResults}");
+                        break;
+
+                    case "not_this":
+                        await SendAutomatedMessage(phoneNumber, "Please enter the number you will use to make payment");
                         break;
 
                     default:

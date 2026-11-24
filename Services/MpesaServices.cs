@@ -13,8 +13,9 @@ namespace whatsapp_cloud_api.Services
         private readonly IConfiguration _configuration;
         public MpesaServices(HttpClient httpClient,IConfiguration configuration)
         {
-            _httpClient.BaseAddress = new Uri("https://sandbox.safaricom.co.ke");
             _httpClient = httpClient;
+            _httpClient.BaseAddress = new Uri("https://sandbox.safaricom.co.ke");
+           
             _configuration = configuration;
             _consumerKey = _configuration.GetValue<string>("MpesaDaraja:ConsumerKey")!;
             _consumerSecret = _configuration.GetValue<string>("MpesaDaraja:ConsumerSecret")!;

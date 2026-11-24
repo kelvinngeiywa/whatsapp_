@@ -44,5 +44,37 @@
     "Order": 0,
     "Parameters": [],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "whatsapp_cloud_api.Controllers.MpesaCallbackController",
+    "Method": "HandleSTKCallback",
+    "RelativePath": "api/MpesaCallback/callback",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "callbackData",
+        "Type": "System.Text.Json.JsonElement",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "whatsapp_cloud_api.Controllers.MpesaCallbackController",
+    "Method": "TestStkPush",
+    "RelativePath": "api/MpesaCallback/test-stk",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "phone",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]
