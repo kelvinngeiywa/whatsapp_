@@ -1,12 +1,13 @@
 ﻿using System.Text;
 using System.Text.Json;
+using whatsapp_cloud_api.Models;
 using whatsapp_cloud_api.Services.IServices;
 using static System.Net.WebRequestMethods;
 
 namespace whatsapp_cloud_api.Services
 {
     public class MessageProcessing(ILogger<MessageProcessing> logger,IWhatsAppMessage whatsAppMessage, IMpesa mpesaServices,
-        IPendingPaymentStore pendingPayment) : IMessageProcessing
+        IPendingPaymentStore pendingPayment,IConversationState currentState) : IMessageProcessing
     {
         private readonly string callBackUrl = "https://winning-corgi-greatly.ngrok-free.app/api/MpesaCallback/callback";
         public async  Task ProcessMesssage(JsonElement message, JsonElement contact)
@@ -50,7 +51,7 @@ namespace whatsapp_cloud_api.Services
 
         private async Task ProcessTextMessage(JsonElement message, string fromNumber, JsonElement contacts)
         {
-            var messageText = message.GetProperty("text").GetProperty("body").GetString().ToLower();
+            var messageText = message.GetProperty("text").GetProperty("body").GetString()!.ToLower();
             logger.LogWarning($"Received text message from {fromNumber}: {messageText}");
             var profileName = contacts.GetProperty("profile").GetProperty("name").GetString();
             logger.LogWarning($"profile is {profileName}");
@@ -287,74 +288,46 @@ namespace whatsapp_cloud_api.Services
             await whatsAppMessage.SendMessage(messagePayload);
         }
 
+        private static readonly Dictionary<string, Decimal> Prices = new()
+        {
+            ["lenovo1"] = 30000,
+            ["lenovo2"] = 25000,
+            ["lenovo3"] = 38000,
+            ["lenovo4"]=32000,
+            ["hp1"] =35000,
+            ["hp2"]=37000,
+            ["techno1"]=20000,
+            ["samsung1"]=26000,
+            ["google_pixel"]=36000,
+            ["vivo1"]=18000
+
+        };
+
 
         private async Task processListreplyMessage(JsonElement message, string phoneNumber)
         {
-            //var listMessage = message.TryGetProperty("interactive", out JsonElement jsonElement) &&
-            //    jsonElement.TryGetProperty("list_reply", out JsonElement listElement);
 
             var listElement = message.GetProperty("interactive").GetProperty("list_reply");
-            var listElementId = message.GetProperty("interactive").GetProperty("list_reply").GetProperty("id").ToString();
-            var productName = listElement.GetProperty("title").ToString();
-            //var productPrice=listElement.GetProperty("")
-            logger.LogWarning($"Select item id is {listElementId}");
-            message.GetProperty("interactive").GetProperty("list_reply");
+            var listElementId = listElement.GetProperty("id").GetString()!;
+            var productName = listElement.GetProperty("title").ToString()!;
 
-            switch (listElementId)
+            if(!Prices.TryGetValue(listElementId,out var price))
             {
-                case "lenovo1":
-                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 30,000");
-
-                    break;
-
-                case "lenovo2":
-                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 25,000");
-                    break;
-
-                case "lenovo3":
-                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 38,000");
-                    break;
-
-                case "lenovo4":
-                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 32,000");
-                    break;
-
-                case "hp1":
-                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 35,000");
-                    break;
-
-                case "hp2":
-                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 35,000");
-                    break;
-
-                case "techno1":
-                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 20,000");
-                    break;
-
-                case "samsung1":
-                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 26,000");
-                    break;
-
-                case "google_pixel":
-                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 36,000");
-                    break;
-
-                case "vivo1":
-                    await SendAutomatedMessage(phoneNumber, $"You've picked {productName} and its price is Ksh. 18,000");
-                    break;
-
-                default:
-                    await SendAutomatedMessage(phoneNumber,"Unknown list id");
-                    break;
-
+                await SendAutomatedMessage(phoneNumber, "Unknown product!!");
+                return;
             }
 
+            var state = currentState.GetState(phoneNumber);
+            state.ProductId = listElementId;
+            state.Productname = productName;
+            state.Amount = price;
+            state.Step = ConversationStep.ConfirmingPaymentNumber;
 
-            
-            
-           
-         //logger.LogWarning(message);
-            
+            logger.LogWarning("Current state is: {state}", state);
+
+            currentState.SaveState(state);
+
+            await SendAutomatedMessage(phoneNumber, $"You've picked: {productName} its price is {price}");
 
         }
 
@@ -398,11 +371,6 @@ namespace whatsapp_cloud_api.Services
                             }
                         }
                         
-
-                        //logger.LogWarning($"Number is {phoneNumber}");
-                        //var stkResults=await mpesaServices.InitiateSTKPushAsync(phoneNumber, 1,callBackUrl);
-                        //logger.LogWarning($"STK results is: {stkResults}");
-                        //await SendAutomatedMessage(phoneNumber, $"STK results is: {stkResults}");
                         break;
 
                     case "not_this":

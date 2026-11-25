@@ -16,6 +16,7 @@ builder.Services.AddScoped<IWhatsAppMessage,WhatsAppMessageService>();
 builder.Services.AddScoped<IMessageProcessing,MessageProcessing>();
 builder.Services.AddScoped<IMpesa, MpesaServices>();
 builder.Services.AddSingleton<IPendingPaymentStore, PendingPaymentStore>();
+builder.Services.AddSingleton<IConversationState, InMemoryConversationState>();
 
 builder.Services.AddCors(options =>
 {
