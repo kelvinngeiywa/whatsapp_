@@ -54,8 +54,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "callbackData",
-        "Type": "System.Text.Json.JsonElement",
+        "Name": "payload",
+        "Type": "whatsapp_cloud_api.Models.MpesaCallBack",
         "IsRequired": true
       }
     ],

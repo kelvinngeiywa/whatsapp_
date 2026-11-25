@@ -5,7 +5,8 @@ using static System.Net.WebRequestMethods;
 
 namespace whatsapp_cloud_api.Services
 {
-    public class MessageProcessing(ILogger<MessageProcessing> logger,IWhatsAppMessage whatsAppMessage, IMpesa mpesaServices) : IMessageProcessing
+    public class MessageProcessing(ILogger<MessageProcessing> logger,IWhatsAppMessage whatsAppMessage, IMpesa mpesaServices,
+        IPendingPaymentStore pendingPayment) : IMessageProcessing
     {
         private readonly string callBackUrl = "https://winning-corgi-greatly.ngrok-free.app/api/MpesaCallback/callback";
         public async  Task ProcessMesssage(JsonElement message, JsonElement contact)
@@ -377,11 +378,31 @@ namespace whatsapp_cloud_api.Services
                         break;
 
                     case "this_number":
-                        await SendAutomatedMessage(phoneNumber, "STK has been sent to this number. Please enter your pin");
-                        logger.LogWarning($"Number is {phoneNumber}");
-                        var stkResults=await mpesaServices.InitiateSTKPushAsync(phoneNumber, 1,callBackUrl);
-                        logger.LogWarning($"STK results is: {stkResults}");
-                        await SendAutomatedMessage(phoneNumber, $"STK results is: {stkResults}");
+                        var stkResponse = await mpesaServices.InitiateSTKPushAsync(phoneNumber,2,callBackUrl);
+
+                        logger.LogInformation("STK initiate response {stkResponse}", stkResponse);
+
+                        using(var doc= JsonDocument.Parse(stkResponse))
+                        {
+                            var root = doc.RootElement;
+
+                            if(root.TryGetProperty("ResponseCode", out var RC) && RC.GetString() == "0")
+                            {
+                                var checkoutId =root.GetProperty("CheckoutRequestID").GetString()!;
+                                pendingPayment.Add(checkoutId, phoneNumber);
+                                await SendAutomatedMessage(phoneNumber, "STK has been sent to this number. Please enter your pin");
+                            }
+                            else
+                            {
+                                await SendAutomatedMessage(phoneNumber, "Sorry, we couldn't start the payment. Please try again!!");
+                            }
+                        }
+                        
+
+                        //logger.LogWarning($"Number is {phoneNumber}");
+                        //var stkResults=await mpesaServices.InitiateSTKPushAsync(phoneNumber, 1,callBackUrl);
+                        //logger.LogWarning($"STK results is: {stkResults}");
+                        //await SendAutomatedMessage(phoneNumber, $"STK results is: {stkResults}");
                         break;
 
                     case "not_this":

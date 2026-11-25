@@ -76,17 +76,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonElement"
+                "$ref": "#/components/schemas/MpesaCallBack"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonElement"
+                "$ref": "#/components/schemas/MpesaCallBack"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonElement"
+                "$ref": "#/components/schemas/MpesaCallBack"
               }
             }
           },
@@ -134,7 +134,98 @@
   },
   "components": {
     "schemas": {
-      "JsonElement": { }
+      "CallbackBody": {
+        "type": "object",
+        "properties": {
+          "stkCallback": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/StkCallback"
+              }
+            ]
+          }
+        }
+      },
+      "CallbackItem": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonElement"
+              }
+            ]
+          }
+        }
+      },
+      "CallbackMetadata": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CallbackItem"
+            }
+          }
+        }
+      },
+      "JsonElement": { },
+      "MpesaCallBack": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CallbackBody"
+              }
+            ]
+          }
+        }
+      },
+      "StkCallback": {
+        "type": "object",
+        "properties": {
+          "merchantRequestID": {
+            "type": "string"
+          },
+          "checkoutRequestID": {
+            "type": "string"
+          },
+          "resultCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "resultDesc": {
+            "type": "string"
+          },
+          "callbackMetadata": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CallbackMetadata"
+              }
+            ]
+          }
+        }
+      }
     }
   },
   "tags": [
